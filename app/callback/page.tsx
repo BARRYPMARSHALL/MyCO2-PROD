@@ -1,15 +1,30 @@
-'use client';
+"use client";
+
+interface User {
+  id: string;
+  email?: string;
+  // Add other user fields as needed
+}
+
+interface Activity {
+  id: string;
+  type: string;
+  distance_miles: number;
+  co2_saved_kg: number;
+  created_at?: string;
+  // Add other activity fields as needed
+}
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function Dashboard() {
-  const [user, setUser] = useState<any>(null);
-  const [points, setPoints] = useState(0);
-  const [co2Saved, setCo2Saved] = useState(0);
-  const [rank, setRank] = useState(0);
-  const [activities, setActivities] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
+  const [user, setUser] = useState<User | null>(null);
+  const [points, setPoints] = useState<number>(0);
+  const [co2Saved, setCo2Saved] = useState<number>(0);
+  const [rank, setRank] = useState<number>(0);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
     const loadUserData = async () => {
