@@ -15,12 +15,12 @@ interface Activity {
 
 export default function Dashboard() {
   const [user, setUser] = useState<User | null>(null);
-  const [points, setPoints] = useState(0);
-  const [co2Saved, setCo2Saved] = useState(0);
-  const [rank, setRank] = useState(0);
+  const [points, setPoints] = useState<number>(0);
+  const [co2Saved, setCo2Saved] = useState<number>(0);
+  const [rank, setRank] = useState<number>(0);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -102,7 +102,6 @@ export default function Dashboard() {
       setLoading(false);
     };
     loadUserData();
-    // eslint-disable-next-line
   }, []);
 
   if (loading) {

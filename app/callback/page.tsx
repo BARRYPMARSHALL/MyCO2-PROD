@@ -14,57 +14,49 @@ interface Activity {
   created_at?: string;
   // Add other activity fields as needed
 }
+
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 
 export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null);
+  // Removed unused: user, loading
   const [points, setPoints] = useState<number>(0);
   const [co2Saved, setCo2Saved] = useState<number>(0);
   const [rank, setRank] = useState<number>(0);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
     const loadUserData = async () => {
-      setLoading(true);
       setMessage('');
 
       // Get authenticated user
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
       if (authError) {
         setMessage(`Auth error: ${authError.message}`);
-        setLoading(false);
         return;
       }
       if (!authUser) {
         setMessage('Not logged in');
-        setLoading(false);
         return;
       }
-
-      setUser(authUser);
 
       // Try to load user data
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('points, co2_saved_kg')
         .eq('id', authUser.id)
-        .maybeSingle(); // ✅ Safe: returns null if no row
+        .maybeSingle();
 
-      if (userError && userError.code !== 'PGRST116') { // Ignore "no rows" error
+      if (userError && userError.code !== 'PGRST116') {
         setMessage(`DB error: ${userError.message}`);
-        setLoading(false);
         return;
       }
 
       if (userData) {
-        // User exists — load data
         setPoints(userData.points || 0);
         setCo2Saved(userData.co2_saved_kg || 0);
       } else {
-        // 🔥 User NOT in public.users — try to fix it
         setMessage('User not found in database. Creating...');
         const { error: insertError } = await supabase
           .from('users')
@@ -98,12 +90,8 @@ export default function Dashboard() {
         setActivities(activityData || []);
       }
 
-      // Mock rank
       setRank(Math.floor(Math.random() * 1000));
-
-      setLoading(false);
     };
-
     loadUserData();
   }, []);
 

@@ -1,5 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
+
+interface User {
+  id: string;
+  email?: string;
+  subscription_status?: string;
+  points?: number;
+  co2_saved_kg?: number;
+}
 import { supabase } from '../../lib/supabaseClient';
 
 // Debug: Show Supabase env variables
@@ -7,17 +15,15 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export default function LogActivity() {
-  const [user, setUser] = useState<any>(null);
-  // Force re-render when user is set
-  const [, forceUpdate] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
   const [type, setType] = useState<'walk' | 'cycle'>('walk');
   const [distance, setDistance] = useState<string>('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>('');
 
   // Check if user is logged in
   // Debug state for getUser result
-  const [debugGetUser, setDebugGetUser] = useState<any>(null);
+  // Removed debugGetUser and forceUpdate for lint/type safety
 
   useEffect(() => {
     let didTimeout = false;
@@ -29,7 +35,7 @@ export default function LogActivity() {
     const checkUser = async () => {
       try {
         const getUserResult = await supabase.auth.getUser();
-        setDebugGetUser(getUserResult);
+  // debugGetUser removed
         const { data: { user }, error } = getUserResult;
         if (didTimeout) return;
         clearTimeout(timeout);
@@ -70,8 +76,8 @@ export default function LogActivity() {
           }
         }
 
-  setUser(user);
-  forceUpdate((n) => n + 1);
+  setUser(user as User);
+  // forceUpdate removed
       } catch (err) {
         setMessage('Unexpected error: ' + (err instanceof Error ? err.message : JSON.stringify(err)));
       }
@@ -84,6 +90,11 @@ export default function LogActivity() {
     e.preventDefault();
     if (!distance || isNaN(parseFloat(distance)) || parseFloat(distance) <= 0) {
       setMessage('Please enter a valid distance');
+      return;
+    }
+
+    if (!user) {
+      setMessage('User not loaded. Please try again.');
       return;
     }
 
@@ -135,11 +146,7 @@ export default function LogActivity() {
           <div className="mt-4 p-2 bg-gray-800 rounded text-xs">
             <div><b>Supabase URL:</b> {supabaseUrl}</div>
             <div><b>Supabase Anon Key:</b> {supabaseAnonKey.slice(0, 8)}...{supabaseAnonKey.slice(-6)}</div>
-            {debugGetUser && (
-              <pre className="mt-2 bg-gray-900 p-2 rounded overflow-x-auto max-w-xs">
-                {JSON.stringify(debugGetUser, null, 2)}
-              </pre>
-            )}
+            {/* debugGetUser removed */}
           </div>
         </div>
       </div>
@@ -154,11 +161,7 @@ export default function LogActivity() {
           <div className="mt-4 p-2 bg-gray-800 rounded text-xs">
             <div><b>Supabase URL:</b> {supabaseUrl}</div>
             <div><b>Supabase Anon Key:</b> {supabaseAnonKey.slice(0, 8)}...{supabaseAnonKey.slice(-6)}</div>
-            {debugGetUser && (
-              <pre className="mt-2 bg-gray-900 p-2 rounded overflow-x-auto max-w-xs">
-                {JSON.stringify(debugGetUser, null, 2)}
-              </pre>
-            )}
+            {/* debugGetUser removed */}
           </div>
         </div>
       </div>
