@@ -8,15 +8,12 @@ import { supabase } from '../../lib/supabaseClient';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+export default function LogPage() {
   const [user, setUser] = useState<User | null>(null);
   const [type, setType] = useState<'walk' | 'cycle'>('walk');
   const [distance, setDistance] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
-
-  // Check if user is logged in
-  // Debug state for getUser result
-  // Removed debugGetUser and forceUpdate for lint/type safety
 
   useEffect(() => {
     let didTimeout = false;
@@ -27,8 +24,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
     const checkUser = async () => {
       try {
-  const { data, error }: { data: { user: User | null }, error: any } = await supabase.auth.getUser();
-  const user = data.user;
+  const { data, error } = await supabase.auth.getUser();
+  const user = data?.user;
         if (didTimeout) return;
         clearTimeout(timeout);
         if (error || !user) {
@@ -76,7 +73,7 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
     };
     checkUser();
     return () => clearTimeout(timeout);
-  }, []);
+  }, [supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -225,4 +222,4 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
       </div>
     </div>
   );
-// ...existing code...
+}

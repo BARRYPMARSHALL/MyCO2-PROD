@@ -28,8 +28,8 @@ export default function Dashboard() {
       setMessage('');
 
       // Get authenticated user with explicit type
-      const { data, error: authError }: { data: { user: User | null }, error: any } = await supabase.auth.getUser();
-      const authUser = data.user;
+      const { data, error: authError } = await supabase.auth.getUser();
+      const authUser = data?.user;
       if (authError) {
         setMessage(`Auth error: ${authError.message}`);
         setLoading(false);
@@ -101,7 +101,7 @@ export default function Dashboard() {
       setLoading(false);
     };
     loadUserData();
-  }, []);
+  }, [supabase]);
 
   if (loading) {
     return (

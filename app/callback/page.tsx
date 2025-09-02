@@ -1,7 +1,5 @@
 "use client";
 
-
-
 interface Activity {
   id: string;
   type: string;
