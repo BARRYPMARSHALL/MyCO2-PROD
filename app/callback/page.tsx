@@ -1,10 +1,6 @@
 "use client";
 
-interface User {
-  id: string;
-  email?: string;
-  // Add other user fields as needed
-}
+
 
 interface Activity {
   id: string;
@@ -17,6 +13,7 @@ interface Activity {
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 export default function Dashboard() {
   // Removed unused: user, loading
@@ -30,8 +27,9 @@ export default function Dashboard() {
     const loadUserData = async () => {
       setMessage('');
 
-      // Get authenticated user
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      // Get authenticated user with explicit type
+      const { data, error: authError }: { data: { user: SupabaseUser | null }, error: any } = await supabase.auth.getUser();
+      const authUser = data.user;
       if (authError) {
         setMessage(`Auth error: ${authError.message}`);
         return;

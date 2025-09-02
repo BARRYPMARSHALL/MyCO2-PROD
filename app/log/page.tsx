@@ -1,20 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
 
-interface User {
-  id: string;
-  email?: string;
-  subscription_status?: string;
-  points?: number;
-  co2_saved_kg?: number;
-}
+import type { User } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabaseClient';
 
 // Debug: Show Supabase env variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-export default function LogActivity() {
   const [user, setUser] = useState<User | null>(null);
   const [type, setType] = useState<'walk' | 'cycle'>('walk');
   const [distance, setDistance] = useState<string>('');
@@ -34,9 +27,8 @@ export default function LogActivity() {
 
     const checkUser = async () => {
       try {
-        const getUserResult = await supabase.auth.getUser();
-  // debugGetUser removed
-        const { data: { user }, error } = getUserResult;
+  const { data, error }: { data: { user: User | null }, error: any } = await supabase.auth.getUser();
+  const user = data.user;
         if (didTimeout) return;
         clearTimeout(timeout);
         if (error || !user) {

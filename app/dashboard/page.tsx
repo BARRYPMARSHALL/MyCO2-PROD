@@ -27,8 +27,9 @@ export default function Dashboard() {
       setLoading(true);
       setMessage('');
 
-      // Get authenticated user
-      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      // Get authenticated user with explicit type
+      const { data, error: authError }: { data: { user: User | null }, error: any } = await supabase.auth.getUser();
+      const authUser = data.user;
       if (authError) {
         setMessage(`Auth error: ${authError.message}`);
         setLoading(false);
@@ -59,7 +60,6 @@ export default function Dashboard() {
         setPoints(userData.points || 0);
         setCo2Saved(userData.co2_saved_kg || 0);
       } else {
-        // User NOT in public.users — try to fix it
         setMessage('User not found in database. Creating...');
         const { error: insertError } = await supabase
           .from('users')
@@ -84,7 +84,7 @@ export default function Dashboard() {
       }
 
       // Load activities
-      const { data: activityData, error: activityError } = await supabase
+    const { data: activityData, error: activityError } = await supabase
         .from('activities')
         .select('*')
         .eq('user_id', authUser.id)
@@ -96,7 +96,6 @@ export default function Dashboard() {
         setActivities(activityData || []);
       }
 
-      // Mock rank
       setRank(Math.floor(Math.random() * 1000));
 
       setLoading(false);
