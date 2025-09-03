@@ -15,21 +15,28 @@ export default function Home() {
 
   useEffect(() => {
     const getUser = async () => {
+      if (!supabase) return;
       const { data } = await supabase.auth.getUser();
       setUser(data?.user || null);
     };
     getUser();
     // Listen for auth changes
-    const { data: listener } = supabase.auth.onAuthStateChange(() => {
-      getUser();
-    });
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
+    if (supabase) {
+      const { data: listener } = supabase.auth.onAuthStateChange(() => {
+        getUser();
+      });
+      return () => {
+        listener?.subscription.unsubscribe();
+      };
+    }
   }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setError("Authentication service not available");
+      return;
+    }
     setLoading(true);
     setError("");
     setMessage("");
@@ -44,6 +51,10 @@ export default function Home() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setError("Authentication service not available");
+      return;
+    }
     setLoading(true);
     setError("");
     setMessage("");
@@ -57,6 +68,10 @@ export default function Home() {
   };
 
   const handleSignOut = async () => {
+    if (!supabase) {
+      setError("Authentication service not available");
+      return;
+    }
     setLoading(true);
     setError("");
     setMessage("");
@@ -70,6 +85,10 @@ export default function Home() {
   };
 
   const handleResetPassword = async () => {
+    if (!supabase) {
+      setError("Authentication service not available");
+      return;
+    }
     setLoading(true);
     setError("");
     setMessage("");

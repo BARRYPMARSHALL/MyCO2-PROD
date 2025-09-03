@@ -24,6 +24,11 @@ export default function LogPage() {
 
     const checkUser = async () => {
       try {
+        if (!supabase) {
+          setMessage('Authentication service not available');
+          return;
+        }
+        
   const { data, error } = await supabase.auth.getUser();
   const user = data?.user;
         if (didTimeout) return;
@@ -73,10 +78,15 @@ export default function LogPage() {
     };
     checkUser();
     return () => clearTimeout(timeout);
-  }, [supabase]);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      setMessage('Authentication service not available');
+      return;
+    }
+    
     if (!distance || isNaN(parseFloat(distance)) || parseFloat(distance) <= 0) {
       setMessage('Please enter a valid distance');
       return;

@@ -23,6 +23,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     const loadUserData = async () => {
+      if (!supabase) {
+        setMessage('Authentication service not available');
+        return;
+      }
+      
       setMessage('');
 
       // Get authenticated user with explicit type
@@ -140,7 +145,11 @@ export default function Dashboard() {
 
         {/* Logout */}
         <button
-          onClick={() => supabase.auth.signOut()}
+          onClick={() => {
+            if (supabase) {
+              supabase.auth.signOut();
+            }
+          }}
           className="w-full mt-8 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded border-4 border-black transition"
         >
           Logout

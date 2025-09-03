@@ -24,6 +24,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     const loadUserData = async () => {
+      if (!supabase) {
+        setMessage('Authentication service not available');
+        setLoading(false);
+        return;
+      }
+      
       setLoading(true);
       setMessage('');
 
@@ -101,7 +107,7 @@ export default function Dashboard() {
       setLoading(false);
     };
     loadUserData();
-  }, [supabase]);
+  }, []);
 
   if (loading) {
     return (
@@ -183,7 +189,9 @@ export default function Dashboard() {
         {/* Logout Button */}
         <button
           onClick={async () => {
-            await supabase.auth.signOut();
+            if (supabase) {
+              await supabase.auth.signOut();
+            }
             window.location.href = "/";
           }}
           className="w-full mt-8 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded border-4 border-black transition"
